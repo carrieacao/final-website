@@ -259,6 +259,9 @@ function displayCurrentWeather(data) {
     const background = getBackgroundForWeather(data.weather[0].main);
     heroWeather.style.background = background;
     
+    // Update BODY background based on weather
+    updateBodyBackground(data.weather[0].main);
+    
     // Update info cards
     document.getElementById('humidity').textContent = `${data.main.humidity}%`;
     document.getElementById('windSpeed').textContent = `${Math.round(data.wind.speed)} ${currentUnit === 'imperial' ? 'mph' : 'm/s'}`;
@@ -314,6 +317,44 @@ function displayForecast(data) {
             </div>
         `;
     }).join('');
+}
+
+function updateBodyBackground(weatherMain) {
+    // Remove all weather classes
+    const weatherClasses = [
+        'weather-clear',
+        'weather-clouds', 
+        'weather-rain',
+        'weather-drizzle',
+        'weather-thunderstorm',
+        'weather-snow',
+        'weather-mist',
+        'weather-fog'
+    ];
+    
+    document.body.classList.remove(...weatherClasses);
+    
+    // Add appropriate weather class
+    const weatherClassMap = {
+        'Clear': 'weather-clear',
+        'Clouds': 'weather-clouds',
+        'Rain': 'weather-rain',
+        'Drizzle': 'weather-drizzle',
+        'Thunderstorm': 'weather-thunderstorm',
+        'Snow': 'weather-snow',
+        'Mist': 'weather-mist',
+        'Fog': 'weather-fog',
+        'Smoke': 'weather-mist',
+        'Haze': 'weather-mist',
+        'Dust': 'weather-mist',
+        'Sand': 'weather-mist',
+        'Ash': 'weather-mist',
+        'Squall': 'weather-thunderstorm',
+        'Tornado': 'weather-thunderstorm'
+    };
+    
+    const weatherClass = weatherClassMap[weatherMain] || 'weather-clear';
+    document.body.classList.add(weatherClass);
 }
 
 function displayRecommendations(data) {
