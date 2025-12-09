@@ -41,6 +41,66 @@
     --font-body: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 }
 
+/* ========================================
+   DYNAMIC WEATHER BACKGROUNDS
+   ======================================== */
+
+body {
+    transition: background 0.8s ease;
+}
+
+/* Weather-specific backgrounds */
+body.weather-clear {
+    background: linear-gradient(180deg, #87CEEB 0%, #f0e68c 100%);
+}
+
+body.weather-clouds {
+    background: linear-gradient(180deg, #bdc3c7 0%, #e8e8e8 100%);
+}
+
+body.weather-rain {
+    background: linear-gradient(180deg, #4a5f7a 0%, #6b7f99 100%);
+}
+
+body.weather-drizzle {
+    background: linear-gradient(180deg, #7ba3b8 0%, #a8c5d6 100%);
+}
+
+body.weather-thunderstorm {
+    background: linear-gradient(180deg, #2c3e50 0%, #4a5f7a 100%);
+}
+
+body.weather-snow {
+    background: linear-gradient(180deg, #e0f2f7 0%, #ffffff 100%);
+}
+
+body.weather-mist,
+body.weather-fog {
+    background: linear-gradient(180deg, #95a5a6 0%, #d5dbdb 100%);
+}
+
+/* Keep cards visible on colored backgrounds */
+body.weather-clear .info-card,
+body.weather-clear .forecast-card,
+body.weather-clear .recommendation-card,
+body.weather-clear .comparison-card,
+body.weather-clear .search-section {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+body.weather-rain .info-card,
+body.weather-rain .forecast-card,
+body.weather-rain .recommendation-card,
+body.weather-rain .comparison-card,
+body.weather-rain .search-section,
+body.weather-thunderstorm .info-card,
+body.weather-thunderstorm .forecast-card,
+body.weather-thunderstorm .recommendation-card,
+body.weather-thunderstorm .comparison-card,
+body.weather-thunderstorm .search-section {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
 body {
     font-family: var(--font-body);
     line-height: 1.6;
