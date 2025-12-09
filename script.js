@@ -91,30 +91,38 @@ function getWeatherIcon(weatherCode, description) {
 function getBackgroundForWeather(weatherMain) {
     // Dynamic background gradients based on weather
     const backgrounds = {
-        'Clear': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        'Clouds': 'linear-gradient(135deg, #757F9A 0%, #D7DDE8 100%)',
-        'Rain': 'linear-gradient(135deg, #4b6cb7 0%, #182848 100%)',
-        'Drizzle': 'linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)',
-        'Thunderstorm': 'linear-gradient(135deg, #2c3e50 0%, #3498db 100%)',
-        'Snow': 'linear-gradient(135deg, #e6dada 0%, #274046 100%)',
-        'Mist': 'linear-gradient(135deg, #606c88 0%, #3f4c6b 100%)',
-        'Fog': 'linear-gradient(135deg, #606c88 0%, #3f4c6b 100%)'
+        'Clear': '#5b7bdb',
+        'Clouds': '#7a8a9e',
+        'Rain': '#4a6b8a',
+        'Drizzle': '#6b9cb8',
+        'Thunderstorm': '#3d5a7a',
+        'Snow': '#8a9ba8',
+        'Mist': '#6b7a88',
+        'Fog': '#6b7a88'
     };
     
-    return backgrounds[weatherMain] || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+    return backgrounds[weatherMain] || '#5b7bdb';
 }
 
-function convertTemp(temp, toUnit) {
-    if (toUnit === 'celsius') {
-        return Math.round((temp - 32) * 5/9);
+function convertTemp(temp, fromUnit, toUnit) {
+    if (fromUnit === toUnit) return temp;
+    
+    if (toUnit === 'metric') {
+        // Convert F to C
+        return (temp - 32) * 5/9;
     } else {
-        return Math.round((temp * 9/5) + 32);
+        // Convert C to F
+        return (temp * 9/5) + 32;
     }
 }
 
 function formatTime(timestamp) {
     const date = new Date(timestamp * 1000);
     return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+function getUnitSymbol() {
+    return currentUnit === 'imperial' ? 'F' : 'C';
 }
 
 // ========================================
@@ -231,11 +239,17 @@ function hideLoading() {
 }
 
 function displayCurrentWeather(data) {
+    const unitSymbol = getUnitSymbol();
+    
     // Update hero section
     document.getElementById('cityName').textContent = `${data.name}, ${data.sys.country}`;
     document.getElementById('mainTemp').textContent = Math.round(data.main.temp);
     document.getElementById('feelsLike').textContent = Math.round(data.main.feels_like);
     document.getElementById('weatherDescription').textContent = data.weather[0].description;
+    
+    // Update temperature unit symbols
+    document.querySelector('.temp-unit').textContent = `°${unitSymbol}`;
+    document.querySelector('.feels-like').innerHTML = `Feels like <span id="feelsLike">${Math.round(data.main.feels_like)}</span>°${unitSymbol}`;
     
     // Update weather icon
     const icon = getWeatherIcon(data.weather[0].icon, data.weather[0].description);
@@ -247,14 +261,18 @@ function displayCurrentWeather(data) {
     
     // Update info cards
     document.getElementById('humidity').textContent = `${data.main.humidity}%`;
-    document.getElementById('windSpeed').textContent = `${Math.round(data.wind.speed)} mph`;
-    document.getElementById('visibility').textContent = `${(data.visibility / 1609.34).toFixed(1)} mi`;
+    document.getElementById('windSpeed').textContent = `${Math.round(data.wind.speed)} ${currentUnit === 'imperial' ? 'mph' : 'm/s'}`;
+    document.getElementById('visibility').textContent = currentUnit === 'imperial' 
+        ? `${(data.visibility / 1609.34).toFixed(1)} mi`
+        : `${(data.visibility / 1000).toFixed(1)} km`;
     document.getElementById('pressure').textContent = `${data.main.pressure} hPa`;
     document.getElementById('sunrise').textContent = formatTime(data.sys.sunrise);
     document.getElementById('sunset').textContent = formatTime(data.sys.sunset);
 }
 
 function displayForecast(data) {
+    const unitSymbol = getUnitSymbol();
+    
     // Group forecast data by day
     const dailyForecasts = {};
     
@@ -289,8 +307,8 @@ function displayForecast(data) {
                 <div class="forecast-date">${dateStr}</div>
                 <div class="forecast-icon">${icon}</div>
                 <div class="forecast-temp">
-                    <span class="high">${high}°</span>
-                    <span class="low">${low}°</span>
+                    <span class="high">${high}°${unitSymbol}</span>
+                    <span class="low">${low}°${unitSymbol}</span>
                 </div>
                 <div class="forecast-desc">${day.weather.description}</div>
             </div>
@@ -299,12 +317,18 @@ function displayForecast(data) {
 }
 
 function displayRecommendations(data) {
-    const temp = data.main.temp;
+    // Always use Fahrenheit for recommendation logic, regardless of display unit
+    let tempInF = data.main.temp;
+    if (currentUnit === 'metric') {
+        // Convert Celsius to Fahrenheit for recommendation logic
+        tempInF = (data.main.temp * 9/5) + 32;
+    }
+    
     const weather = data.weather[0].main;
     const recommendations = [];
     
-    // Generate recommendations based on weather
-    if (weather === 'Clear' && temp >= 70 && temp <= 85) {
+    // Generate recommendations based on weather (using Fahrenheit thresholds)
+    if (weather === 'Clear' && tempInF >= 70 && tempInF <= 85) {
         recommendations.push({
             icon: '🥾',
             title: 'Perfect for Hiking',
@@ -337,7 +361,7 @@ function displayRecommendations(data) {
             title: 'Winter Wonderland',
             description: 'Bundle up and enjoy the scenic snowy landscapes.'
         });
-    } else if (temp > 85) {
+    } else if (tempInF > 85) {
         recommendations.push({
             icon: '🏖️',
             title: 'Beach or Pool Day',
@@ -348,7 +372,7 @@ function displayRecommendations(data) {
             title: 'Indoor Activities',
             description: 'Consider air-conditioned venues to beat the heat.'
         });
-    } else if (temp < 40) {
+    } else if (tempInF < 40) {
         recommendations.push({
             icon: '🧥',
             title: 'Layer Up',
@@ -372,10 +396,10 @@ function displayRecommendations(data) {
         });
     }
     
-    // What to pack suggestions
+    // What to pack suggestions (also based on Fahrenheit)
     const packItems = [];
-    if (temp > 80) packItems.push('sunscreen', 'water bottle', 'hat');
-    else if (temp < 50) packItems.push('jacket', 'warm layers', 'gloves');
+    if (tempInF > 80) packItems.push('sunscreen', 'water bottle', 'hat');
+    else if (tempInF < 50) packItems.push('jacket', 'warm layers', 'gloves');
     else packItems.push('light jacket', 'comfortable shoes');
     
     if (weather === 'Rain' || weather === 'Drizzle') {
@@ -426,15 +450,24 @@ function toggleTemperatureUnit() {
 }
 
 function updateComparisonUnits() {
-    comparisonCities.forEach((city, index) => {
-        const card = comparisonContainer.children[index];
-        if (card && !card.classList.contains('empty-state')) {
-            const tempElement = card.querySelector('.comparison-temp');
-            const currentTemp = parseInt(tempElement.textContent);
-            const newTemp = currentUnit === 'metric' ? 
-                convertTemp(currentTemp, 'celsius') : 
-                convertTemp(currentTemp, 'fahrenheit');
-            tempElement.textContent = `${newTemp}°`;
+    // Re-fetch all comparison cities with new unit
+    const tempCities = [...comparisonCities];
+    comparisonCities = [];
+    
+    tempCities.forEach(async (city) => {
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/weather?q=${city.name},${city.sys.country}&units=${currentUnit}&appid=${API_KEY}`
+            );
+            const data = await response.json();
+            comparisonCities.push(data);
+            
+            // Update display after all cities are fetched
+            if (comparisonCities.length === tempCities.length) {
+                updateComparisonDisplay();
+            }
+        } catch (error) {
+            console.error('Error updating comparison:', error);
         }
     });
 }
@@ -473,6 +506,8 @@ function addCurrentCityToComparison() {
 }
 
 function updateComparisonDisplay() {
+    const unitSymbol = getUnitSymbol();
+    
     if (comparisonCities.length === 0) {
         comparisonContainer.innerHTML = `
             <div class="empty-state">
@@ -486,6 +521,10 @@ function updateComparisonDisplay() {
     
     comparisonContainer.innerHTML = comparisonCities.map((city, index) => {
         const icon = getWeatherIcon(city.weather[0].icon, city.weather[0].description);
+        const windUnit = currentUnit === 'imperial' ? 'mph' : 'm/s';
+        const visibilityValue = currentUnit === 'imperial' 
+            ? `${(city.visibility / 1609.34).toFixed(1)} mi`
+            : `${(city.visibility / 1000).toFixed(1)} km`;
         
         return `
             <div class="comparison-card">
@@ -495,7 +534,7 @@ function updateComparisonDisplay() {
                 </div>
                 <div class="comparison-body">
                     <div class="weather-icon">${icon}</div>
-                    <div class="comparison-temp">${Math.round(city.main.temp)}°</div>
+                    <div class="comparison-temp">${Math.round(city.main.temp)}°${unitSymbol}</div>
                     <div class="comparison-condition">${city.weather[0].description}</div>
                     <div class="comparison-details">
                         <div class="detail-item">
@@ -504,15 +543,15 @@ function updateComparisonDisplay() {
                         </div>
                         <div class="detail-item">
                             <strong>Wind</strong>
-                            ${Math.round(city.wind.speed)} mph
+                            ${Math.round(city.wind.speed)} ${windUnit}
                         </div>
                         <div class="detail-item">
                             <strong>Feels Like</strong>
-                            ${Math.round(city.main.feels_like)}°
+                            ${Math.round(city.main.feels_like)}°${unitSymbol}
                         </div>
                         <div class="detail-item">
                             <strong>Visibility</strong>
-                            ${(city.visibility / 1609.34).toFixed(1)} mi
+                            ${visibilityValue}
                         </div>
                     </div>
                 </div>
