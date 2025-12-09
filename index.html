@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Wandercast - A beautiful weather dashboard to help you plan your next travel destination by comparing weather conditions across multiple cities.">
+    <title>Wandercast - Weather Travel Planner</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">🌤️ Wandercast</h1>
+            <p class="tagline">Plan your perfect getaway with live weather insights</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Search Section -->
+        <section class="search-section">
+            <div class="container">
+                <div class="search-box">
+                    <input 
+                        type="text" 
+                        id="cityInput" 
+                        placeholder="Search for a city... (e.g., Paris, Tokyo, New York)"
+                        autocomplete="off"
+                    >
+                    <button id="searchBtn" class="btn-primary">
+                        <span class="btn-icon">🔍</span>
+                        Search
+                    </button>
+                </div>
+                <div id="searchSuggestions" class="suggestions-dropdown"></div>
+            </div>
+        </section>
+
+        <!-- Hero Weather Section -->
+        <section id="heroWeather" class="hero-weather">
+            <div class="weather-backdrop"></div>
+            <div class="container hero-content">
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Loading weather data...</p>
+                </div>
+                <div class="weather-display" style="display: none;">
+                    <div class="location-info">
+                        <h2 id="cityName">St. Louis</h2>
+                        <p id="currentDate"></p>
+                    </div>
+                    <div class="temp-display">
+                        <div class="temp-main">
+                            <span id="mainTemp">--</span>
+                            <span class="temp-unit">°F</span>
+                        </div>
+                        <div class="temp-controls">
+                            <button id="unitToggle" class="unit-toggle">
+                                <span class="unit-option active">°F</span>
+                                <span class="unit-divider">|</span>
+                                <span class="unit-option">°C</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="weather-condition">
+                        <div class="weather-icon" id="weatherIcon">☀️</div>
+                        <p id="weatherDescription">Clear Sky</p>
+                        <p class="feels-like">Feels like <span id="feelsLike">--</span>°</p>
+                    </div>
+                    <button id="addToCompare" class="btn-secondary">
+                        <span class="btn-icon">➕</span>
+                        Add to Comparison
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Detailed Info Cards -->
+        <section class="info-cards">
+            <div class="container">
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <div class="card-icon">💧</div>
+                        <div class="card-label">Humidity</div>
+                        <div class="card-value" id="humidity">--</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="card-icon">💨</div>
+                        <div class="card-label">Wind Speed</div>
+                        <div class="card-value" id="windSpeed">--</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="card-icon">👁️</div>
+                        <div class="card-label">Visibility</div>
+                        <div class="card-value" id="visibility">--</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="card-icon">🌡️</div>
+                        <div class="card-label">Pressure</div>
+                        <div class="card-value" id="pressure">--</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="card-icon">🌅</div>
+                        <div class="card-label">Sunrise</div>
+                        <div class="card-value" id="sunrise">--</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="card-icon">🌇</div>
+                        <div class="card-label">Sunset</div>
+                        <div class="card-value" id="sunset">--</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5-Day Forecast -->
+        <section class="forecast-section">
+            <div class="container">
+                <h2 class="section-title">5-Day Forecast</h2>
+                <div id="forecastContainer" class="forecast-grid">
+                    <!-- Forecast cards will be inserted here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Travel Recommendations -->
+        <section class="recommendations-section">
+            <div class="container">
+                <h2 class="section-title">Travel Recommendations</h2>
+                <div id="recommendationsContainer" class="recommendations-grid">
+                    <!-- Recommendations will be inserted here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- City Comparison -->
+        <section class="comparison-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Compare Destinations</h2>
+                    <button id="clearComparison" class="btn-text">Clear All</button>
+                </div>
+                <div id="comparisonContainer" class="comparison-grid">
+                    <div class="empty-state">
+                        <div class="empty-icon">🗺️</div>
+                        <p>No cities added yet</p>
+                        <p class="empty-subtitle">Search for cities and add them to compare weather conditions</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>Weather data provided by OpenWeatherMap API</p>
+            <p class="footer-note">Wandercast - Your Travel Weather Companion</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
